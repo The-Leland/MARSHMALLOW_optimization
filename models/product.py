@@ -5,7 +5,7 @@ import marshmallow as ma
 from db import db
 from models import category
 from models import warranty
-from .product_category_xref import product_category_association_table
+
 
 
 class Products(db.Model):
@@ -25,10 +25,10 @@ class Products(db.Model):
     )
 
     categories = db.relationship(
-        "Categories",
-        secondary=product_category_association_table,
-        back_populates="products"
-    )
+    "Categories",
+    secondary="products_categories_association",
+    back_populates="products"
+)
 
     warranty = db.relationship(
         "Warranties",
@@ -64,6 +64,4 @@ class ProductsSchema(ma.Schema):
     warranty = ma.fields.Nested("WarrantiesSchema", exclude=['product'])
 
 
-# product_schema = ProductsSchema()
-# products_schema = ProductsSchema(many=True)
 

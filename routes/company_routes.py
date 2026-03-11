@@ -1,18 +1,3 @@
-# from flask import Blueprint, 
-
-# import controllers
-
-
-# company=Blueprint('company', __name__)
-
-# @company.route('/company', methods=["POST"])
-# def add_company():
-#     return controllers.add_company()
-
-
-# @company.route("/company/<company_id>", method=["PUT"])
-# def update_company_by_id(company_id):
-#     return controllers.updata_company_by_id(company_id)
 
 
 
@@ -21,8 +6,13 @@ from flask import Blueprint, request, jsonify
 from controllers.company_controller import (
     add_company,
     get_all_companies,
-    update_company_by_id
+    get_company_by_id,
+    update_company_by_id,
+    delete_company_by_id
 )
+
+from db import db
+
 from controllers.company_controller import company_schema, companies_schema
 from models.company import Companies
 
@@ -48,6 +38,19 @@ def get_all_companies_route():
     }), 200
 
 
+@company.route('/company/<company_id>', methods=['GET'])
+def get_company_route(company_id):
+    company = get_company_by_id(company_id)
+
+    if company is None:
+        return jsonify({"message": "company not found"}), 404
+
+    return jsonify({
+        "message": "company retrieved",
+        "result": company_schema.dump(company)
+    }), 200
+
+
 @company.route('/company/<company_id>', methods=['PUT'])
 def update_company_route(company_id):
     data = request.get_json()
@@ -60,3 +63,16 @@ def update_company_route(company_id):
         "message": "company updated",
         "result": company_schema.dump(updated_company)
     }), 200
+
+
+@company.route('/company/<company_id>', methods=['DELETE'])
+def delete_company_route(company_id):
+    company = Companies.query.get(company_id)
+
+    if company is None:
+        return jsonify({"message": "company not found"}), 404
+
+    db.session.delete(company)
+    db.session.commit()
+
+    return jsonify({"message": "company deleted"}), 200

@@ -15,7 +15,6 @@ warranty_schema = WarrantySchema()
 warranties_schema = WarrantySchema(many=True)
 
 
-# CREATE
 def add_warranty():
     post_data = request.form if request.form else request.get_json()
 
@@ -36,7 +35,7 @@ def add_warranty():
     }), 201
 
 
-# READ
+
 def get_all_warranties():
     warranties = db.session.query(Warranties).all()
 
@@ -58,7 +57,7 @@ def get_warranty_by_id(warranty_id):
     }), 200
 
 
-# UPDATE
+
 def update_warranty_by_id(warranty_id):
     warranty = db.session.query(Warranties).filter(Warranties.warranty_id == warranty_id).first()
     post_data = request.form if request.form else request.get_json()
@@ -75,7 +74,7 @@ def update_warranty_by_id(warranty_id):
     }), 200
 
 
-# DELETE
+
 def delete_warranty(warranty_id):
     warranty = db.session.query(Warranties).filter(Warranties.warranty_id == warranty_id).first()
 

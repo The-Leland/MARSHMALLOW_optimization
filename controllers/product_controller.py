@@ -18,7 +18,6 @@ product_schema = ProductSchema()
 products_schema = ProductSchema(many=True)
 
 
-# CREATE
 def add_product():
     post_data = request.form if request.form else request.get_json()
 
@@ -40,7 +39,7 @@ def add_product():
     }), 201
 
 
-# READ
+
 def get_all_products():
     products = db.session.query(Products).all()
 
@@ -62,7 +61,7 @@ def get_product_by_id(product_id):
     }), 200
 
 
-# UPDATE
+
 def update_product_by_id(product_id):
     product_query = db.session.query(Products).filter(Products.product_id == product_id).first()
     post_data = request.form if request.form else request.get_json()
@@ -79,7 +78,7 @@ def update_product_by_id(product_id):
     return jsonify({"message": "unable to update record"}), 400
 
 
-# DELETE
+
 def delete_product_by_id(product_id):
     product = db.session.query(Products).filter(Products.product_id == product_id).first()
 

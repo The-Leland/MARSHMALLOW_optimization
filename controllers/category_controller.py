@@ -13,12 +13,13 @@ categories_schema = CategorySchema(many=True)
 
 
 def add_category(data):
-    new_category = Categories(category_name="")
-    populate_object(new_category, data)
+    new_category = Categories(
+        category_name=data.get("category_name")
+    )
 
     db.session.add(new_category)
     db.session.commit()
-
+    
     return new_category
 
 

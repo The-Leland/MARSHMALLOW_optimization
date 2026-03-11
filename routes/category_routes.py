@@ -5,11 +5,10 @@ from controllers.category_controller import (
     get_all_categories,
     get_category_by_id,
     update_category_by_id,
-    delete_category_by_id
+    delete_category_by_id,
+    category_schema,
+    categories_schema
 )
-from controllers.category_controller import category_schema, categories_schema
-
-# from models.category import category_schema, categories_schema
 
 category = Blueprint('category', __name__)
 

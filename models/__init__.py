@@ -1,5 +1,6 @@
-# from .category import Categories
-# from .company import Company
-# from .product import Product
-# from .warranty import Warranty
-# from .product_category_xref import ProductCategoryXref
+
+
+from .product_category import ProductCategory
+from .company import Companies
+from .category import Categories
+from .product import Products

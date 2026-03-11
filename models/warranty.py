@@ -21,10 +21,3 @@ class Warranties(db.Model):
         self.product_id = product_id
 
 
-# class WarrantiesSchema(ma.Schema):
-#     class Meta:
-#         fields = ['warranty_id', 'warranty_length', 'warranty_description', 'product']
-
-
-# warranty_schema = WarrantiesSchema()
-# warranties_schema = WarrantiesSchema(many=True)
