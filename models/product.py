@@ -1,67 +1,51 @@
-import uuid
-from sqlalchemy.dialects.postgresql import UUID
-import marshmallow as ma
 
 from db import db
-from models import category
-from models import warranty
+from util.reflection import reflect_table
+import marshmallow as ma
 
-
+from models.company import CompaniesSchema
+from models.category import CategoriesSchema
+from models.warranty import WarrantiesSchema
 
 class Products(db.Model):
-    __tablename__ = "products"
+    __table__ = reflect_table("products")
 
-    product_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    product_name = db.Column(db.String(), nullable=False)
-    description = db.Column(db.String())
-    price = db.Column(db.Float())
-    active = db.Column(db.Boolean(), default=True)
-    company_id = db.Column(UUID(as_uuid=True), db.ForeignKey("companies.company_id"), nullable=False)
-
+    # Relationships preserved exactly as your original design
     company = db.relationship(
         "Companies",
-        foreign_keys=[company_id],
-        back_populates="products"
+        foreign_keys=[__table__.c.company_id],
+        backref="products"
     )
 
     categories = db.relationship(
-    "Categories",
-    secondary="products_categories_association",
-    back_populates="products"
-)
+        "Categories",
+        secondary="products_categories_association",
+        backref="products"
+    )
 
     warranty = db.relationship(
         "Warranties",
         foreign_keys="Warranties.product_id",
-        back_populates="product",
         uselist=False,
-        cascade="all"
+        backref="product"
     )
-
-    def __init__(self, product_name, description, price, company_id, active=True):
-        self.product_name = product_name
-        self.description = description
-        self.price = price
-        self.company_id = company_id
-        self.active = active
-
 
 class ProductsSchema(ma.Schema):
     class Meta:
         fields = [
-            'product_id',
-            'product_name',
-            'description',
-            'price',
-            'company',
-            'categories',
-            'warranty',
-            'active'
+            "product_id",
+            "product_name",
+            "description",
+            "price",
+            "active",
+            "company",
+            "categories",
+            "warranty"
         ]
 
-    company = ma.fields.Nested("CompaniesSchema", exclude=['products'])
-    categories = ma.fields.Nested("CategoriesSchema", many=True, exclude=['products'])
-    warranty = ma.fields.Nested("WarrantiesSchema", exclude=['product'])
+    company = ma.fields.Nested(CompaniesSchema)
+    categories = ma.fields.Nested(CategoriesSchema, many=True)
+    warranty = ma.fields.Nested(WarrantiesSchema)
 
-
-
+products_schema = ProductsSchema()
+products_list_schema = ProductsSchema(many=True)

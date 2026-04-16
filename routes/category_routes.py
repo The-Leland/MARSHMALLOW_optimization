@@ -1,3 +1,6 @@
+
+
+
 from flask import Blueprint, request, jsonify
 
 from controllers.category_controller import (
@@ -5,10 +8,10 @@ from controllers.category_controller import (
     get_all_categories,
     get_category_by_id,
     update_category_by_id,
-    delete_category_by_id,
-    category_schema,
-    categories_schema
+    delete_category_by_id
 )
+
+from models.category import categories_schema, categories_list_schema
 
 category = Blueprint('category', __name__)
 
@@ -19,7 +22,7 @@ def add_category_route():
     new_category = add_category(data)
     return jsonify({
         "message": "category created",
-        "result": category_schema.dump(new_category)
+        "result": categories_schema.dump(new_category)
     }), 201
 
 
@@ -28,7 +31,7 @@ def get_all_categories_route():
     categories = get_all_categories()
     return jsonify({
         "message": "categories retrieved",
-        "results": categories_schema.dump(categories)
+        "results": categories_list_schema.dump(categories)
     }), 200
 
 
@@ -41,7 +44,7 @@ def get_category_by_id_route(category_id):
 
     return jsonify({
         "message": "category retrieved",
-        "result": category_schema.dump(category_obj)
+        "result": categories_schema.dump(category_obj)
     }), 200
 
 
@@ -55,7 +58,7 @@ def update_category_route(category_id):
 
     return jsonify({
         "message": "category updated",
-        "result": category_schema.dump(updated_category)
+        "result": categories_schema.dump(updated_category)
     }), 200
 
 

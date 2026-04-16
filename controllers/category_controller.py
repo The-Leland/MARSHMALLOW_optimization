@@ -1,15 +1,7 @@
+
 from models.category import Categories
 from util.reflection import populate_object
 from db import db
-
-from marshmallow import Schema, fields
-
-class CategorySchema(Schema):
-    category_id = fields.UUID()
-    category_name = fields.String()
-
-category_schema = CategorySchema()
-categories_schema = CategorySchema(many=True)
 
 
 def add_category(data):
@@ -54,4 +46,3 @@ def delete_category_by_id(category_id):
     db.session.commit()
 
     return category
-

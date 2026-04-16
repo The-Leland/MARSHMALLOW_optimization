@@ -3,19 +3,6 @@ from models.product import Products
 from models.category import Categories
 from db import db
 
-from flask_marshmallow import Marshmallow
-
-ma = Marshmallow()
-
-class ProductCategorySchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = ProductCategory
-        load_instance = True
-        include_fk = True
-
-product_category_schema = ProductCategorySchema()
-product_categories_schema = ProductCategorySchema(many=True)
-
 
 def add_product_category(data):
     product_id = data.get("product_id")
@@ -60,8 +47,11 @@ def delete_product_category(data):
         category_id=category_id
     ).first()
 
-    if link:
-        db.session.delete(link)
-        db.session.commit()
+    if not link:
+        return None
 
-    return True
+    db.session.delete(link)
+    db.session.commit()
+
+    return link
+

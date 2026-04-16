@@ -4,15 +4,6 @@ from models.company import Companies
 from util.reflection import populate_object
 from db import db
 
-from marshmallow import Schema, fields
-
-class CompanySchema(Schema):
-    company_id = fields.UUID()
-    company_name = fields.String()
-
-company_schema = CompanySchema()
-companies_schema = CompanySchema(many=True)
-
 
 def add_company(data):
     new_company = Companies(

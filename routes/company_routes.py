@@ -11,10 +11,7 @@ from controllers.company_controller import (
     delete_company_by_id
 )
 
-from db import db
-
-from controllers.company_controller import company_schema, companies_schema
-from models.company import Companies
+from models.company import companies_schema, companies_list_schema
 
 company = Blueprint('company', __name__)
 
@@ -25,7 +22,7 @@ def add_company_route():
     new_company = add_company(data)
     return jsonify({
         "message": "company created",
-        "result": company_schema.dump(new_company)
+        "result": companies_schema.dump(new_company)
     }), 201
 
 
@@ -34,20 +31,20 @@ def get_all_companies_route():
     companies = get_all_companies()
     return jsonify({
         "message": "companies retrieved",
-        "results": companies_schema.dump(companies)
+        "results": companies_list_schema.dump(companies)
     }), 200
 
 
 @company.route('/company/<company_id>', methods=['GET'])
 def get_company_route(company_id):
-    company = get_company_by_id(company_id)
+    company_obj = get_company_by_id(company_id)
 
-    if company is None:
+    if company_obj is None:
         return jsonify({"message": "company not found"}), 404
 
     return jsonify({
         "message": "company retrieved",
-        "result": company_schema.dump(company)
+        "result": companies_schema.dump(company_obj)
     }), 200
 
 
@@ -61,18 +58,16 @@ def update_company_route(company_id):
 
     return jsonify({
         "message": "company updated",
-        "result": company_schema.dump(updated_company)
+        "result": companies_schema.dump(updated_company)
     }), 200
 
 
 @company.route('/company/<company_id>', methods=['DELETE'])
 def delete_company_route(company_id):
-    company = Companies.query.get(company_id)
+    deleted = delete_company_by_id(company_id)
 
-    if company is None:
+    if deleted is None:
         return jsonify({"message": "company not found"}), 404
 
-    db.session.delete(company)
-    db.session.commit()
-
     return jsonify({"message": "company deleted"}), 200
+

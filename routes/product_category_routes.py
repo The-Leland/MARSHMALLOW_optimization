@@ -1,12 +1,13 @@
 from flask import Blueprint, request, jsonify
+
 from controllers.product_category_controller import (
     add_product_category,
     get_all_product_categories,
     get_categories_for_product,
-    delete_product_category,
-    product_category_schema,
-    product_categories_schema
+    delete_product_category
 )
+
+from models.product_category import product_category_schema, product_categories_schema
 
 product_category = Blueprint('product_category', __name__)
 
@@ -45,7 +46,8 @@ def get_categories_for_product_route():
 def delete_product_category_route():
     data = request.get_json()
     deleted = delete_product_category(data)
-    return jsonify({
-        "message": "product category deleted"
-    }), 200
 
+    if deleted is None:
+        return jsonify({"message": "product category not found"}), 404
+
+    return jsonify({"message": "product category deleted"}), 200

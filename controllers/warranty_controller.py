@@ -1,87 +1,53 @@
-from flask import jsonify, request
 
 from db import db
 from models.warranty import Warranties
 from util.reflection import populate_object
-from marshmallow import Schema, fields
-
-class WarrantySchema(Schema):
-    warranty_id = fields.UUID()
-    product_id = fields.UUID()
-    duration_months = fields.Integer()
-    details = fields.String()
-
-warranty_schema = WarrantySchema()
-warranties_schema = WarrantySchema(many=True)
 
 
-def add_warranty():
-    post_data = request.form if request.form else request.get_json()
-
+def add_warranty(data):
     new_warranty = Warranties(
         warranty_length=0,
         warranty_description="",
         product_id=None
     )
 
-    populate_object(new_warranty, post_data)
+    populate_object(new_warranty, data)
 
     db.session.add(new_warranty)
     db.session.commit()
 
-    return jsonify({
-        "message": "warranty created",
-        "result": warranty_schema.dump(new_warranty)
-    }), 201
-
+    return new_warranty
 
 
 def get_all_warranties():
-    warranties = db.session.query(Warranties).all()
-
-    return jsonify({
-        "message": "warranties retrieved",
-        "results": warranties_schema.dump(warranties)
-    }), 200
+    return db.session.query(Warranties).all()
 
 
 def get_warranty_by_id(warranty_id):
     warranty = db.session.query(Warranties).filter(Warranties.warranty_id == warranty_id).first()
-
-    if not warranty:
-        return jsonify({"message": "warranty not found"}), 404
-
-    return jsonify({
-        "message": "warranty retrieved",
-        "result": warranty_schema.dump(warranty)
-    }), 200
+    return warranty
 
 
-
-def update_warranty_by_id(warranty_id):
+def update_warranty_by_id(warranty_id, data):
     warranty = db.session.query(Warranties).filter(Warranties.warranty_id == warranty_id).first()
-    post_data = request.form if request.form else request.get_json()
 
     if not warranty:
-        return jsonify({"message": "warranty not found"}), 404
+        return None
 
-    populate_object(warranty, post_data)
+    populate_object(warranty, data)
     db.session.commit()
 
-    return jsonify({
-        "message": "warranty updated",
-        "result": warranty_schema.dump(warranty)
-    }), 200
+    return warranty
 
 
-
-def delete_warranty(warranty_id):
+def delete_warranty_by_id(warranty_id):
     warranty = db.session.query(Warranties).filter(Warranties.warranty_id == warranty_id).first()
 
     if not warranty:
-        return jsonify({"message": "warranty not found"}), 404
+        return None
 
     db.session.delete(warranty)
     db.session.commit()
 
-    return jsonify({"message": "warranty deleted"}), 200
+    return warranty
+

@@ -1,6 +1,7 @@
 
 
-from .product_category import ProductCategory
+from .product import Products
 from .company import Companies
 from .category import Categories
-from .product import Products
+from .warranty import Warranties
+from .product_category import ProductCategory
