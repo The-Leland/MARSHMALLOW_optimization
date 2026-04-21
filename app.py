@@ -19,7 +19,7 @@ database_name = os.environ.get("DATABASE_NAME")
 
 app = Flask(__name__)
 
-# Class example does NOT include password in URI
+
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"{database_scheme}{database_user}:{database_password}"
     f"@{database_address}:{database_port}/{database_name}"
@@ -29,7 +29,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 init_db(app)
 
-# Register all blueprints using the class pattern
+
 register_blueprints(app)
 
 def create_tables():
