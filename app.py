@@ -1,14 +1,17 @@
 
 
+
+
 from flask import Flask
-from flask_marshmallow import Marshmallow
 import os
 
 from db import db, init_db
-from util.blueprints import register_blueprints
 
-
-import models
+from routes.product_routes import products
+from routes.company_routes import company
+from routes.category_routes import category
+from routes.warranty_routes import warranty
+from routes.product_category_routes import product_category
 
 flask_host = os.environ.get("FLASK_HOST")
 flask_port = os.environ.get("FLASK_PORT")
@@ -29,13 +32,18 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 init_db(app)
-ma = Marshmallow(app)
 
-register_blueprints(app)
+app.register_blueprint(products)
+app.register_blueprint(company)
+app.register_blueprint(category)
+app.register_blueprint(warranty)
+app.register_blueprint(product_category)
 
 def create_tables():
     with app.app_context():
+        print("Creating tables...")
         db.create_all()
+        print("Tables created successfully")
 
 if __name__ == '__main__':
     create_tables()

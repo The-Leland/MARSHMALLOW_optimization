@@ -1,16 +1,22 @@
 
 
-from models.company import Companies
+from models import Companies
 from util.reflection import populate_object
 from db import db
 
 
 def add_company(data):
     new_company = Companies(
-        company_name=data.get("company_name")
+        company_name="",
+        description="",
+        active=True
     )
+
+    populate_object(new_company, data)
+
     db.session.add(new_company)
     db.session.commit()
+
     return new_company
 
 
@@ -19,7 +25,7 @@ def get_all_companies():
 
 
 def get_company_by_id(company_id):
-    return Companies.query.get(company_id)
+    return db.session.query(Companies).filter_by(company_id=company_id).first()
 
 
 def update_company_by_id(company_id, data):
@@ -35,11 +41,12 @@ def update_company_by_id(company_id, data):
 
 
 def delete_company_by_id(company_id):
-    company = Companies.query.get(company_id)
+    company = db.session.query(Companies).filter_by(company_id=company_id).first()
 
     if company is None:
         return None
 
     db.session.delete(company)
     db.session.commit()
+
     return company

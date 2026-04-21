@@ -10,7 +10,7 @@ from controllers.warranty_controller import (
     delete_warranty_by_id
 )
 
-from models.warranty import warranties_schema, warranties_list_schema
+from models.warranty import WarrantySchema
 
 warranty = Blueprint('warranty', __name__)
 
@@ -21,7 +21,7 @@ def add_warranty_route():
     new_warranty = add_warranty(data)
     return jsonify({
         "message": "warranty created",
-        "result": warranties_schema.dump(new_warranty)
+        "result": WarrantySchema().dump(new_warranty)
     }), 201
 
 
@@ -30,7 +30,7 @@ def get_all_warranties_route():
     all_warranties = get_all_warranties()
     return jsonify({
         "message": "warranties retrieved",
-        "results": warranties_list_schema.dump(all_warranties)
+        "results": WarrantySchema(many=True).dump(all_warranties)
     }), 200
 
 
@@ -43,7 +43,7 @@ def get_warranty_by_id_route(warranty_id):
 
     return jsonify({
         "message": "warranty retrieved",
-        "result": warranties_schema.dump(warranty_obj)
+        "result": WarrantySchema().dump(warranty_obj)
     }), 200
 
 
@@ -57,7 +57,7 @@ def update_warranty_by_id_route(warranty_id):
 
     return jsonify({
         "message": "warranty updated",
-        "result": warranties_schema.dump(updated_warranty)
+        "result": WarrantySchema().dump(updated_warranty)
     }), 200
 
 

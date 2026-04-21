@@ -1,16 +1,29 @@
 
 
 
-from db import db
-from util.reflection import reflect_table
-import marshmallow as ma
+from db import db, ma
 
 class Categories(db.Model):
-    __table__ = reflect_table("categories")
+    __tablename__ = "categories"
 
-class CategoriesSchema(ma.Schema):
+    category_id = db.Column(db.Integer, primary_key=True)
+    category_name = db.Column(db.String(255), nullable=False)
+    active = db.Column(db.Boolean, default=True)
+
+    products = db.relationship(
+        "Products",
+        secondary="productscategoriesxref",
+        back_populates="categories"
+    )
+
+
+class CategorySchema(ma.SQLAlchemySchema):
     class Meta:
-        fields = ["category_id", "category_name"]
+        model = Categories
+        load_instance = True
 
-categories_schema = CategoriesSchema()
-categories_list_schema = CategoriesSchema(many=True)
+    category_id = ma.auto_field()
+    category_name = ma.auto_field()
+    active = ma.auto_field()
+
+

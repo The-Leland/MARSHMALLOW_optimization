@@ -11,7 +11,7 @@ from controllers.company_controller import (
     delete_company_by_id
 )
 
-from models.company import companies_schema, companies_list_schema
+from models.company import CompanySchema
 
 company = Blueprint('company', __name__)
 
@@ -22,7 +22,7 @@ def add_company_route():
     new_company = add_company(data)
     return jsonify({
         "message": "company created",
-        "result": companies_schema.dump(new_company)
+        "result": CompanySchema().dump(new_company)
     }), 201
 
 
@@ -31,7 +31,7 @@ def get_all_companies_route():
     companies = get_all_companies()
     return jsonify({
         "message": "companies retrieved",
-        "results": companies_list_schema.dump(companies)
+        "results": CompanySchema(many=True).dump(companies)
     }), 200
 
 
@@ -44,7 +44,7 @@ def get_company_route(company_id):
 
     return jsonify({
         "message": "company retrieved",
-        "result": companies_schema.dump(company_obj)
+        "result": CompanySchema().dump(company_obj)
     }), 200
 
 
@@ -58,7 +58,7 @@ def update_company_route(company_id):
 
     return jsonify({
         "message": "company updated",
-        "result": companies_schema.dump(updated_company)
+        "result": CompanySchema().dump(updated_company)
     }), 200
 
 
@@ -70,4 +70,3 @@ def delete_company_route(company_id):
         return jsonify({"message": "company not found"}), 404
 
     return jsonify({"message": "company deleted"}), 200
-

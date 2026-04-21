@@ -7,8 +7,6 @@ from controllers.product_category_controller import (
     delete_product_category
 )
 
-from models.product_category import product_category_schema, product_categories_schema
-
 product_category = Blueprint('product_category', __name__)
 
 
@@ -18,16 +16,26 @@ def add_product_category_route():
     new_link = add_product_category(data)
     return jsonify({
         "message": "product category created",
-        "result": product_category_schema.dump(new_link)
+        "result": {
+            "product_id": new_link.product_id,
+            "category_id": new_link.category_id
+        }
     }), 201
 
 
 @product_category.route('/product-categories', methods=['GET'])
 def get_all_product_categories_route():
     links = get_all_product_categories()
+    results = [
+        {
+            "product_id": link.product_id,
+            "category_id": link.category_id
+        }
+        for link in links
+    ]
     return jsonify({
         "message": "product categories retrieved",
-        "results": product_categories_schema.dump(links)
+        "results": results
     }), 200
 
 

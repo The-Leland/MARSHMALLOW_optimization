@@ -6,8 +6,11 @@ from db import db
 
 def add_category(data):
     new_category = Categories(
-        category_name=data.get("category_name")
+        category_name="",
+        active=True
     )
+
+    populate_object(new_category, data)
 
     db.session.add(new_category)
     db.session.commit()
@@ -20,8 +23,7 @@ def get_all_categories():
 
 
 def get_category_by_id(category_id):
-    category = db.session.query(Categories).filter_by(category_id=category_id).first()
-    return category
+    return db.session.query(Categories).filter_by(category_id=category_id).first()
 
 
 def update_category_by_id(category_id, data):

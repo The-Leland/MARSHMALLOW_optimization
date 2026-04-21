@@ -1,15 +1,31 @@
 
 
-from db import db
-from util.reflection import reflect_table
-import marshmallow as ma
+
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
+from db import db, ma
 
 class Companies(db.Model):
-    __table__ = reflect_table("companies")
+    __tablename__ = "companies"
 
-class CompaniesSchema(ma.Schema):
+    company_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    company_name = db.Column(db.String(255), nullable=False, unique=True)
+    description = db.Column(db.Text)
+    active = db.Column(db.Boolean, default=True)
+
+    products = db.relationship(
+        "Products",
+        back_populates="company",
+        cascade="all, delete"
+    )
+
+
+class CompanySchema(ma.SQLAlchemySchema):
     class Meta:
-        fields = ["company_id", "company_name"]
+        model = Companies
+        load_instance = True
+        include_relationships = True
 
-companies_schema = CompaniesSchema()
-companies_list_schema = CompaniesSchema(many=True)
+    company_id = ma.auto_field()
+    company_name = ma.auto_field()
+

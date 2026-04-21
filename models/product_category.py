@@ -1,7 +1,10 @@
 
 
 from db import db
-from util.reflection import reflect_table
+from sqlalchemy.dialects.postgresql import UUID
 
-class ProductCategory(db.Model):
-    __table__ = reflect_table("products_categories_association")
+class ProductsCategoriesXref(db.Model):
+    __tablename__ = "productscategoriesxref"
+
+    product_id = db.Column(UUID(as_uuid=True), db.ForeignKey("products.product_id"), primary_key=True)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.category_id"), primary_key=True)

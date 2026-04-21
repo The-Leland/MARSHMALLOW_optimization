@@ -1,14 +1,30 @@
 
-from db import db
-from util.reflection import reflect_table
-import marshmallow as ma
+
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
+from db import db, ma
+
 
 class Warranties(db.Model):
-    __table__ = reflect_table("warranties")
+    __tablename__ = "warranties"
 
-class WarrantiesSchema(ma.Schema):
+    warranty_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    product_id = db.Column(UUID(as_uuid=True), db.ForeignKey("products.product_id"), nullable=False)
+    warranty_months = db.Column(db.Integer, nullable=False)
+
+    product = db.relationship(
+        "Products",
+        back_populates="warranty"
+    )
+
+
+class WarrantySchema(ma.SQLAlchemySchema):
     class Meta:
-        fields = ["warranty_id", "product_id", "warranty_months"]
+        model = Warranties
+        load_instance = True
+        include_relationships = True
 
-warranties_schema = WarrantiesSchema()
-warranties_list_schema = WarrantiesSchema(many=True)
+    warranty_id = ma.auto_field()
+    product_id = ma.auto_field()
+    warranty_months = ma.auto_field()
+

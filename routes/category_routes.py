@@ -11,7 +11,7 @@ from controllers.category_controller import (
     delete_category_by_id
 )
 
-from models.category import categories_schema, categories_list_schema
+from models.category import CategorySchema
 
 category = Blueprint('category', __name__)
 
@@ -22,7 +22,7 @@ def add_category_route():
     new_category = add_category(data)
     return jsonify({
         "message": "category created",
-        "result": categories_schema.dump(new_category)
+        "result": CategorySchema().dump(new_category)
     }), 201
 
 
@@ -31,7 +31,7 @@ def get_all_categories_route():
     categories = get_all_categories()
     return jsonify({
         "message": "categories retrieved",
-        "results": categories_list_schema.dump(categories)
+        "results": CategorySchema(many=True).dump(categories)
     }), 200
 
 
@@ -44,7 +44,7 @@ def get_category_by_id_route(category_id):
 
     return jsonify({
         "message": "category retrieved",
-        "result": categories_schema.dump(category_obj)
+        "result": CategorySchema().dump(category_obj)
     }), 200
 
 
@@ -58,7 +58,7 @@ def update_category_route(category_id):
 
     return jsonify({
         "message": "category updated",
-        "result": categories_schema.dump(updated_category)
+        "result": CategorySchema().dump(updated_category)
     }), 200
 
 

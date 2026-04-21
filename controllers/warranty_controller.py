@@ -1,14 +1,13 @@
 
 from db import db
-from models.warranty import Warranties
+from models import Warranties
 from util.reflection import populate_object
 
 
 def add_warranty(data):
     new_warranty = Warranties(
-        warranty_length=0,
-        warranty_description="",
-        product_id=None
+        product_id=None,
+        warranty_months=0
     )
 
     populate_object(new_warranty, data)
@@ -24,8 +23,7 @@ def get_all_warranties():
 
 
 def get_warranty_by_id(warranty_id):
-    warranty = db.session.query(Warranties).filter(Warranties.warranty_id == warranty_id).first()
-    return warranty
+    return db.session.query(Warranties).filter(Warranties.warranty_id == warranty_id).first()
 
 
 def update_warranty_by_id(warranty_id, data):
@@ -50,4 +48,3 @@ def delete_warranty_by_id(warranty_id):
     db.session.commit()
 
     return warranty
-

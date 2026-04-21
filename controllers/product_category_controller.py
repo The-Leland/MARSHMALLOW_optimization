@@ -1,6 +1,6 @@
-from models.product_category import ProductCategory
-from models.product import Products
-from models.category import Categories
+from models import ProductsCategoriesXref
+from models import Products
+from models import Categories
 from db import db
 
 
@@ -8,7 +8,7 @@ def add_product_category(data):
     product_id = data.get("product_id")
     category_id = data.get("category_id")
 
-    new_link = ProductCategory(
+    new_link = ProductsCategoriesXref(
         product_id=product_id,
         category_id=category_id
     )
@@ -20,15 +20,15 @@ def add_product_category(data):
 
 
 def get_all_product_categories():
-    return ProductCategory.query.all()
+    return db.session.query(ProductsCategoriesXref).all()
 
 
 def get_categories_for_product(product_id):
-    links = ProductCategory.query.filter_by(product_id=product_id).all()
+    links = db.session.query(ProductsCategoriesXref).filter_by(product_id=product_id).all()
 
     categories = []
     for link in links:
-        category = Categories.query.get(link.category_id)
+        category = db.session.query(Categories).filter_by(category_id=link.category_id).first()
         if category:
             categories.append({
                 "category_id": category.category_id,
@@ -42,7 +42,7 @@ def delete_product_category(data):
     product_id = data.get("product_id")
     category_id = data.get("category_id")
 
-    link = ProductCategory.query.filter_by(
+    link = db.session.query(ProductsCategoriesXref).filter_by(
         product_id=product_id,
         category_id=category_id
     ).first()

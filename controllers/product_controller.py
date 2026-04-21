@@ -5,11 +5,11 @@ from util.reflection import populate_object
 
 def add_product(data):
     new_product = Products(
-        name="",
+        company_id=None,
+        company_name="",
         description="",
         price=0,
-        active=True,
-        company_id=None
+        active=True
     )
 
     populate_object(new_product, data)
@@ -25,8 +25,7 @@ def get_all_products():
 
 
 def get_product_by_id(product_id):
-    product = db.session.query(Products).filter(Products.product_id == product_id).first()
-    return product
+    return db.session.query(Products).filter(Products.product_id == product_id).first()
 
 
 def update_product_by_id(product_id, data):
