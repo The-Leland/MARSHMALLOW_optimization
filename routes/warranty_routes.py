@@ -1,71 +1,26 @@
 
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint
+from controllers import warranty_controller
 
-from controllers.warranty_controller import (
-    add_warranty,
-    get_all_warranties,
-    get_warranty_by_id,
-    update_warranty_by_id,
-    delete_warranty_by_id
-)
+warranties = Blueprint("warranties", __name__)
 
-from models.warranty import WarrantySchema
+@warranties.route("/warranty", methods=["POST"])
+def route_add_warranty():
+    return warranty_controller.add_warranty()
 
-warranty = Blueprint('warranty', __name__)
+@warranties.route("/warranties", methods=["GET"])
+def route_get_all_warranties():
+    return warranty_controller.get_all_warranties()
 
+@warranties.route("/warranty/<warranty_id>", methods=["GET"])
+def route_get_warranty_by_id(warranty_id):
+    return warranty_controller.get_warranty_by_id(warranty_id)
 
-@warranty.route('/warranty', methods=['POST'])
-def add_warranty_route():
-    data = request.get_json()
-    new_warranty = add_warranty(data)
-    return jsonify({
-        "message": "warranty created",
-        "result": WarrantySchema().dump(new_warranty)
-    }), 201
+@warranties.route("/warranty/<warranty_id>", methods=["PUT"])
+def route_update_warranty(warranty_id):
+    return warranty_controller.update_warranty_by_id(warranty_id)
 
-
-@warranty.route('/warranties', methods=['GET'])
-def get_all_warranties_route():
-    all_warranties = get_all_warranties()
-    return jsonify({
-        "message": "warranties retrieved",
-        "results": WarrantySchema(many=True).dump(all_warranties)
-    }), 200
-
-
-@warranty.route('/warranty/<warranty_id>', methods=['GET'])
-def get_warranty_by_id_route(warranty_id):
-    warranty_obj = get_warranty_by_id(warranty_id)
-
-    if warranty_obj is None:
-        return jsonify({"message": "warranty not found"}), 404
-
-    return jsonify({
-        "message": "warranty retrieved",
-        "result": WarrantySchema().dump(warranty_obj)
-    }), 200
-
-
-@warranty.route('/warranty/<warranty_id>', methods=['PUT'])
-def update_warranty_by_id_route(warranty_id):
-    data = request.get_json()
-    updated_warranty = update_warranty_by_id(warranty_id, data)
-
-    if updated_warranty is None:
-        return jsonify({"message": "warranty not found"}), 404
-
-    return jsonify({
-        "message": "warranty updated",
-        "result": WarrantySchema().dump(updated_warranty)
-    }), 200
-
-
-@warranty.route('/warranty/<warranty_id>', methods=['DELETE'])
-def delete_warranty_route(warranty_id):
-    deleted = delete_warranty_by_id(warranty_id)
-
-    if deleted is None:
-        return jsonify({"message": "warranty not found"}), 404
-
-    return jsonify({"message": "warranty deleted"}), 200
+@warranties.route("/warranty/<warranty_id>", methods=["DELETE"])
+def route_delete_warranty(warranty_id):
+    return warranty_controller.delete_warranty_by_id(warranty_id)

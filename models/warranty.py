@@ -2,29 +2,39 @@
 
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
-from db import db, ma
+import marshmallow as ma
+
+from db import db
 
 
 class Warranties(db.Model):
-    __tablename__ = "warranties"
+    __tablename__ = "Warranties"
 
     warranty_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    product_id = db.Column(UUID(as_uuid=True), db.ForeignKey("products.product_id"), nullable=False)
+    product_id = db.Column(UUID(as_uuid=True), db.ForeignKey("Products.product_id"), nullable=False)
     warranty_months = db.Column(db.Integer, nullable=False)
 
     product = db.relationship(
         "Products",
+        foreign_keys='[Warranties.product_id]',
         back_populates="warranty"
     )
 
+    def __init__(self, product_id, warranty_months):
+        self.product_id = product_id
+        self.warranty_months = warranty_months
 
-class WarrantySchema(ma.SQLAlchemySchema):
+
+class WarrantiesSchema(ma.Schema):
     class Meta:
-        model = Warranties
-        load_instance = True
-        include_relationships = True
+        fields = ["warranty_id", "product_id", "warranty_months", "product"]
 
-    warranty_id = ma.auto_field()
-    product_id = ma.auto_field()
-    warranty_months = ma.auto_field()
+    warranty_id = ma.fields.UUID()
+    product_id = ma.fields.UUID()
+    warranty_months = ma.fields.Integer()
 
+    product = ma.fields.Nested("ProductsSchema", exclude=["warranty"])
+
+
+warranty_schema = WarrantiesSchema()
+warranties_schema = WarrantiesSchema(many=True)

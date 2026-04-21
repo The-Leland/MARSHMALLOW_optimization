@@ -1,72 +1,27 @@
 
 
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint
+from controllers import category_controller
 
-from controllers.category_controller import (
-    add_category,
-    get_all_categories,
-    get_category_by_id,
-    update_category_by_id,
-    delete_category_by_id
-)
+categories = Blueprint("categories", __name__)
 
-from models.category import CategorySchema
+@categories.route("/category", methods=["POST"])
+def route_add_category():
+    return category_controller.add_category()
 
-category = Blueprint('category', __name__)
+@categories.route("/categories", methods=["GET"])
+def route_get_all_categories():
+    return category_controller.get_all_categories()
 
+@categories.route("/category/<category_id>", methods=["GET"])
+def route_get_category_by_id(category_id):
+    return category_controller.get_category_by_id(category_id)
 
-@category.route('/category', methods=['POST'])
-def add_category_route():
-    data = request.get_json()
-    new_category = add_category(data)
-    return jsonify({
-        "message": "category created",
-        "result": CategorySchema().dump(new_category)
-    }), 201
+@categories.route("/category/<category_id>", methods=["PUT"])
+def route_update_category(category_id):
+    return category_controller.update_category_by_id(category_id)
 
-
-@category.route('/categories', methods=['GET'])
-def get_all_categories_route():
-    categories = get_all_categories()
-    return jsonify({
-        "message": "categories retrieved",
-        "results": CategorySchema(many=True).dump(categories)
-    }), 200
-
-
-@category.route('/category/<category_id>', methods=['GET'])
-def get_category_by_id_route(category_id):
-    category_obj = get_category_by_id(category_id)
-
-    if category_obj is None:
-        return jsonify({"message": "category not found"}), 404
-
-    return jsonify({
-        "message": "category retrieved",
-        "result": CategorySchema().dump(category_obj)
-    }), 200
-
-
-@category.route('/category/<category_id>', methods=['PUT'])
-def update_category_route(category_id):
-    data = request.get_json()
-    updated_category = update_category_by_id(category_id, data)
-
-    if updated_category is None:
-        return jsonify({"message": "category not found"}), 404
-
-    return jsonify({
-        "message": "category updated",
-        "result": CategorySchema().dump(updated_category)
-    }), 200
-
-
-@category.route('/category/<category_id>', methods=['DELETE'])
-def delete_category_route(category_id):
-    deleted = delete_category_by_id(category_id)
-
-    if deleted is None:
-        return jsonify({"message": "category not found"}), 404
-
-    return jsonify({"message": "category deleted"}), 200
+@categories.route("/category/<category_id>", methods=["DELETE"])
+def route_delete_category(category_id):
+    return category_controller.delete_category_by_id(category_id)

@@ -1,10 +1,11 @@
 
 
 
-from db import db, ma
+import marshmallow as ma
+from db import db
 
 class Categories(db.Model):
-    __tablename__ = "categories"
+    __tablename__ = "Categories"
 
     category_id = db.Column(db.Integer, primary_key=True)
     category_name = db.Column(db.String(255), nullable=False)
@@ -16,14 +17,23 @@ class Categories(db.Model):
         back_populates="categories"
     )
 
+    def __init__(self, category_name, active=True):
+        self.category_name = category_name
+        self.active = active
 
-class CategorySchema(ma.SQLAlchemySchema):
+
+class CategoriesSchema(ma.Schema):
     class Meta:
-        model = Categories
-        load_instance = True
+        fields = ["category_id", "category_name", "active", "products"]
 
-    category_id = ma.auto_field()
-    category_name = ma.auto_field()
-    active = ma.auto_field()
+    category_id = ma.fields.Integer()
+    category_name = ma.fields.String()
+    active = ma.fields.Boolean()
+
+    products = ma.fields.Nested("ProductsSchema", many=True, exclude=["categories"])
+
+
+category_schema = CategoriesSchema()
+categories_schema = CategoriesSchema(many=True)
 
 

@@ -1,60 +1,101 @@
+from flask import jsonify, request
 from db import db
-from models.product import Products
+from models import Products, product_schema, products_schema
 from util.reflection import populate_object
 
 
-def add_product(data):
+def add_product():
+    data = request.form if request.form else request.get_json()
+
     new_product = Products(
-        company_id=None,
-        company_name="",
-        description="",
-        price=0,
-        active=True
+        product_name=data.get("product_name"),
+        description=data.get("description"),
+        price=data.get("price"),
+        company_id=data.get("company_id"),
+        active=data.get("active", True)
     )
 
-    populate_object(new_product, data)
+    try:
+        db.session.add(new_product)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return jsonify({"message": "unable to create product"}), 400
 
-    db.session.add(new_product)
-    db.session.commit()
-
-    return new_product
+    return jsonify({
+        "message": "product created",
+        "result": product_schema.dump(new_product)
+    }), 201
 
 
 def get_all_products():
-    return db.session.query(Products).all()
+    products = Products.query.all()
+    return jsonify({
+        "message": "products retrieved",
+        "results": products_schema.dump(products)
+    }), 200
 
 
 def get_product_by_id(product_id):
-    return db.session.query(Products).filter(Products.product_id == product_id).first()
-
-
-def update_product_by_id(product_id, data):
-    product = db.session.query(Products).filter(Products.product_id == product_id).first()
+    product = Products.query.filter_by(product_id=product_id).first()
 
     if not product:
-        return None
+        return jsonify({"message": "product not found"}), 404
 
+    return jsonify({
+        "message": "product retrieved",
+        "result": product_schema.dump(product)
+    }), 200
+
+
+def update_product_by_id(product_id):
+    product = Products.query.filter_by(product_id=product_id).first()
+
+    if not product:
+        return jsonify({"message": "product not found"}), 404
+
+    data = request.form if request.form else request.get_json()
     populate_object(product, data)
-    db.session.commit()
 
-    return product
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return jsonify({"message": "unable to update product"}), 400
+
+    return jsonify({
+        "message": "product updated",
+        "result": product_schema.dump(product)
+    }), 200
 
 
 def delete_product_by_id(product_id):
-    product = db.session.query(Products).filter(Products.product_id == product_id).first()
+    product = Products.query.filter_by(product_id=product_id).first()
 
     if not product:
-        return None
+        return jsonify({"message": "product not found"}), 404
 
-    db.session.delete(product)
-    db.session.commit()
+    try:
+        db.session.delete(product)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return jsonify({"message": "unable to delete product"}), 400
 
-    return product
+    return jsonify({"message": "product deleted"}), 200
 
 
 def get_active_products():
-    return db.session.query(Products).filter(Products.active == True).all()
+    products = Products.query.filter_by(active=True).all()
+    return jsonify({
+        "message": "active products retrieved",
+        "results": products_schema.dump(products)
+    }), 200
 
 
 def get_products_by_company(company_id):
-    return db.session.query(Products).filter(Products.company_id == company_id).all()
+    products = Products.query.filter_by(company_id=company_id).all()
+    return jsonify({
+        "message": "products retrieved for company",
+        "results": products_schema.dump(products)
+    }), 200

@@ -1,72 +1,27 @@
 
 
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint
+from controllers import company_controller
 
-from controllers.company_controller import (
-    add_company,
-    get_all_companies,
-    get_company_by_id,
-    update_company_by_id,
-    delete_company_by_id
-)
+companies = Blueprint("companies", __name__)
 
-from models.company import CompanySchema
+@companies.route("/company", methods=["POST"])
+def route_add_company():
+    return company_controller.add_company()
 
-company = Blueprint('company', __name__)
+@companies.route("/companies", methods=["GET"])
+def route_get_all_companies():
+    return company_controller.get_all_companies()
 
+@companies.route("/company/<company_id>", methods=["GET"])
+def route_get_company_by_id(company_id):
+    return company_controller.get_company_by_id(company_id)
 
-@company.route('/company', methods=['POST'])
-def add_company_route():
-    data = request.get_json()
-    new_company = add_company(data)
-    return jsonify({
-        "message": "company created",
-        "result": CompanySchema().dump(new_company)
-    }), 201
+@companies.route("/company/<company_id>", methods=["PUT"])
+def route_update_company(company_id):
+    return company_controller.update_company_by_id(company_id)
 
-
-@company.route('/companies', methods=['GET'])
-def get_all_companies_route():
-    companies = get_all_companies()
-    return jsonify({
-        "message": "companies retrieved",
-        "results": CompanySchema(many=True).dump(companies)
-    }), 200
-
-
-@company.route('/company/<company_id>', methods=['GET'])
-def get_company_route(company_id):
-    company_obj = get_company_by_id(company_id)
-
-    if company_obj is None:
-        return jsonify({"message": "company not found"}), 404
-
-    return jsonify({
-        "message": "company retrieved",
-        "result": CompanySchema().dump(company_obj)
-    }), 200
-
-
-@company.route('/company/<company_id>', methods=['PUT'])
-def update_company_route(company_id):
-    data = request.get_json()
-    updated_company = update_company_by_id(company_id, data)
-
-    if updated_company is None:
-        return jsonify({"message": "company not found"}), 404
-
-    return jsonify({
-        "message": "company updated",
-        "result": CompanySchema().dump(updated_company)
-    }), 200
-
-
-@company.route('/company/<company_id>', methods=['DELETE'])
-def delete_company_route(company_id):
-    deleted = delete_company_by_id(company_id)
-
-    if deleted is None:
-        return jsonify({"message": "company not found"}), 404
-
-    return jsonify({"message": "company deleted"}), 200
+@companies.route("/company/<company_id>", methods=["DELETE"])
+def route_delete_company(company_id):
+    return company_controller.delete_company_by_id(company_id)
